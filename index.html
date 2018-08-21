@@ -86,6 +86,10 @@
             },
             move(){
                 this.y += this.speed;
+                //如果雨尾已经超过屏幕最下方,则回到屏幕最上方
+                if(this.y - this.str.length * this.h > h){
+                    this.y = 0;
+                }
             }
         };
         
@@ -107,11 +111,13 @@
         generateRain(RAIN_NUMBER);
 
         setInterval(() => {
+            //清除屏幕
             ctx.beginPath();
             ctx.fillStyle = 'rgb(0,0,0)';
             ctx.fillRect(0,0,w,h);
             ctx.closePath();
             ctx.fill();
+            //改变位置,重绘所有雨滴
             for(let item of rainArr){
                 item.move();
                 item.draw();
