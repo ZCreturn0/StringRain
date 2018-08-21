@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数字雨</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #numRain{
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="numRain"></canvas>
+    <script>
+        function Util(){
+            //随机生成字符范围
+            this.rangeStr="QWERTYUIOPASDFGHJKLZXCVBNM";//qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890
+            this.rangeArr=this.rangeStr.split("");
+            this.rangeLen=this.rangeArr.length;
+        }
+        Util.prototype = {
+            /*
+            *随机生成n个字符
+            *@param n(number)
+            *@return (str)
+            */
+            getRandomStr:function(n){
+                var str = "";
+                for(let i=0;i<n;i++){
+                    str += this.rangeArr[Math.floor(Math.random() * this.rangeLen)]
+                }
+                return str;
+            },
+            /*
+            *随机生成一个范围内的整数
+            *@param min(number)
+            *@param max(number)
+            *@return(number)
+            */
+            random:function(min,max){
+                return Math.round(Math.random() * (max-min) + min);
+            }
+        };
+        var util = new Util();
+        
+        var canvas = document.querySelector("#numRain");
+        var ctx = canvas.getContext('2d');
+        ctx.textAlign='center';
+
+        var w,h;
+        (function(){
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = w;
+            canvas.height = h;
+            window.onresize = arguments.callee;
+        })();
+
+    //    console.log(util.getRandomStr(util.random(10,20)));
+
+        var rainArr = [];
+        function Rain(){}
+        Rain.prototype = {
+            init:function(){
+                this.x = util.random(0,w);
+                this.y = 0;
+                this.w = util.random(12,16);
+                this.h = this.w;
+                this.fontSize = util.random(8,12);
+                this.str = util.getRandomStr(util.random(10,20));
+                this.speed = util.random(1,4);
+                this.color = "lime";
+            },
+            draw:function(){
+                ctx.fillStyle=this.color;
+                ctx.font = `${this.fontSize}px 微软雅黑`;
+                for(let i=0;i<this.str.length;i++){
+                    ctx.fillText(this.str[i],this.x,this.y - i * this.h);
+                }
+            },
+            move(){
+                this.y += this.speed;
+            }
+        };
+        
+        const RAIN_NUMBER = 66;
+        /*
+        *生成num雨滴
+        *@num (number)
+        @return undefined
+        */
+        function generateRain(num){
+            for(let i = 0;i < num;i++){
+                setTimeout(() => {
+                    var rain = new Rain();
+                    rain.init();
+                    rainArr.push(rain);
+                },200*i);
+            }
+        }
+        generateRain(RAIN_NUMBER);
+
+        setInterval(() => {
+            ctx.beginPath();
+            ctx.fillStyle = 'rgb(0,0,0)';
+            ctx.fillRect(0,0,w,h);
+            ctx.closePath();
+            ctx.fill();
+            for(let item of rainArr){
+                item.move();
+                item.draw();
+            }
+        },1000/60);
+    </script>
+</body>
+</html>
